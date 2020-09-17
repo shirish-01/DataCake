@@ -1,38 +1,47 @@
 from mxproxy import mx
+import os
 
-class Logic:
-	def __init__(self):
-		pass	
 
-	def filter(stringlist,include):
-	# inclusive filter stringlist intersection include
-		return list(filter(lambda x: True if include in x else False,stringlist))
-
-	def get_hrefs(soupList): 
-	#error proof href extraction from anchor tags
-		l=[]
-		try:
-			for a in anchors: l.append(a['href'])
-		except Exception as e: pass
-		return l
-
-class memory:
-	"""docstring for memory"""
-	def __init__(self, arg):
-		super(memory, self).__init__()
-		self.arg = arg
-		
  
-class Spider:
+class Explorer:
+
 	def __init__(self,url):
-		self.page = 	 mx.get_page(url,soupify=True)
+		self.url=url
+		self.domain= url.split("/")[2]
+		self.domainCategory= url.split("/")[-1] #https://..asd/(category)<-
+
+	def profile_check_make(self,entity):
+		#smart profile management for scraper
+		programName=__file__.split("\\")[-1].split('.')[0]
+		profileFolder=programName+"_profiles"
+		currentEntityPath='./{}/{}/'.format(profileFolder,entity)
+		entityExploreFile=currentEntityPath+'explored.url'
+		entityVisitFile=currentEntityPath+'visited.url'
+
+		try:
+			#make profile folder and create an entity
+			if not os.path.exists(profileFolder): 
+				os.mkdir(profileFolder) ;print("Created Folder",profileFolder)
+			os.mkdir(currentEntityPath)
+		except:
+			print(self.domain,"profile already exist")
+		finally:
+			mx.touch(entityExploreFile) #Create if file not exist
+			mx.touch(entityVisitFile) #Create if file not exist
+			# print("Touched =>",[entityExploreFile,entityVisitFile])
+
+	def explore(self):
+		self.page = 	 mx.get_page(self.url,soupify=True)
 		self.page.urls = [x['href'] for x in self.page.find_all(href=True)]
-	
-	def explore():
-		pass
-	
-	def extract_data(url):
-		return	mx.get_page_selenium(url,strategy="normal")
+
+		#load in memory if exist
+		goodUrl=set(filter(lambda x:'.html' and self.domainCategory in x,self.page.urls))
+		self.profile_check_make(self.domain)
+
+
+
+
+
 
 	def update_explore():
 		pass
@@ -40,29 +49,28 @@ class Spider:
 	def update_visit():
 		pass
 
-
-
-
-
-
-
 # DRIVER CODE
 if __name__ == '__main__':
-	baseurl="https://www.livemint.com/companies/start-ups"
-	category=baseurl.split("/")[-1]
+	homeurl="https://www.livemint.com/companies/start-ups"
+	explorer=Explorer(homeurl)
+	explorer.explore()
 
-	pno=1
-	pagesExhausted=0
-	while pagesExhausted != 1 and pno <3:
-		try:
-			dynlink=baseurl+"/page-{}".format(pno)
-			spider=Spider(baseurl)
-			goodUrl=set(filter(lambda x:'.html' and category in x,spider.page.urls))
-			print(len(goodUrl))
 
-			pno+=1
-		except Exception as e:
-			pagesExhausted=1
-			print(category,"Exhaust @ page{} with error {}".format(pno-1,e))
+	# pno=1
+	# pagesExhausted=0
+	# while pagesExhausted != 1 and pno <3:
+	# 	try:
+	# 		dynlink=baseurl+"/page-{}".format(pno)
+	# 		spider=Spider(baseurl)
+	# 		goodUrl=set(filter(lambda x:'.html' and category in x,spider.page.urls))
+	# 		print(len(goodUrl))
+
+	# 		pno+=1
+	# 	except Exception as e:
+	# 		pagesExhausted=1
+	# 		print(category,"Exhaust @ page{} with error {}".format(pno-1,e))
+
+
+
 
 
