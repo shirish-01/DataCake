@@ -1,75 +1,81 @@
 from mxproxy import mx
 import os
 
+class Memory:
+	def __init__(self,domainExploreFile):
+		self.domainExploreFile=domainExploreFile
 
- 
+	def get_explored_links(self,domainExploreFile):
+		return set(mx.fread(domainExploreFile).split('\n'))
+
+	def set_explored_links(self,domainExploreFile,newLinks):
+		nowDiscovered= 	set(nowDiscovered)
+		prevDiscovered= set(mx.fread(self.domainExploreFile).split('\n'))
+		difference= 	list(nowDiscovered-prevDiscovered)
+		mx.fappend(self.domainExploreFile, "\n".join(difference))
+		union= 			prevDiscovered.union(nowDiscovered)
+		print("added {} URL records".format(len(difference)))
+		
 class Explorer:
 
 	def __init__(self,url):
 		self.url=url
+		self.baseurl='/'.join(url.split('/')[0:3])
 		self.domain= url.split("/")[2]
-		self.domainCategory= url.split("/")[-1] #https://..asd/(category)<-
 
-	def profile_check_make(self,entity):
+		#dynamic profile creation variables
+		self.programName=__file__.split("\\")[-1].split('.')[0]
+		self.profileFolder=self.programName+"_profiles"
+		self.currentDomainPath='./{}/{}/'.format(self.profileFolder,self.domain)
+		self.domainExploreFile=self.currentDomainPath+'explored.url'
+		self.domainVisitFile=self.currentDomainPath+'visited.url'
+		self.profile_check_make(self.domain) #MAKE A PROFILE FOR DOMAIN
+
+	def profile_check_make(self,domain):
 		#smart profile management for scraper
-		programName=__file__.split("\\")[-1].split('.')[0]
-		profileFolder=programName+"_profiles"
-		currentEntityPath='./{}/{}/'.format(profileFolder,entity)
-		entityExploreFile=currentEntityPath+'explored.url'
-		entityVisitFile=currentEntityPath+'visited.url'
-
 		try:
-			#make profile folder and create an entity
-			if not os.path.exists(profileFolder): 
-				os.mkdir(profileFolder) ;print("Created Folder",profileFolder)
-			os.mkdir(currentEntityPath)
+			#make profile folder and create an domain
+			if not os.path.exists(self.profileFolder): 
+				os.mkdir(self.profileFolder) ;print("Created Folder",self.profileFolder)
+			os.mkdir(self.currentDomainPath)
 		except:
 			print(self.domain,"profile already exist")
 		finally:
-			mx.touch(entityExploreFile) #Create if file not exist
-			mx.touch(entityVisitFile) #Create if file not exist
-			# print("Touched =>",[entityExploreFile,entityVisitFile])
+			mx.touch(self.domainExploreFile) #Create if file not exist
+			mx.touch(self.domainVisitFile) #Create if file not exist
 
-	def explore(self):
-		self.page = 	 mx.get_page(self.url,soupify=True)
-		self.page.urls = [x['href'] for x in self.page.find_all(href=True)]
+	def update_explore(self,nowDiscovered):
+		#unique set of link knowledge
+		nowDiscovered= 	set(nowDiscovered)
+		prevDiscovered= set(mx.fread(self.domainExploreFile).split('\n'))
+		difference= 	list(nowDiscovered-prevDiscovered)
+		mx.fappend(self.domainExploreFile, "\n".join(difference))
+		print("added {} URL records".format(len(difference)))
 
-		#load in memory if exist
-		goodUrl=set(filter(lambda x:'.html' and self.domainCategory in x,self.page.urls))
-		self.profile_check_make(self.domain)
+		fullUrlRecords=	prevDiscovered.union(nowDiscovered)
+		return fullUrlRecords
 
+	def findLinks(self,url):
+		page=mx.get_page(url, soupify=True)
+		allLinks=page.findAll('a',href=True)
+		filteredLinks=[l['href'] for l in allLinks if ('-' or 'html' in l['href']) or (l['href'][0]=='/')  ]
+		self.update_explore(filteredLinks)
+		# print(filteredLinks)
 
-
-
-
-
-	def update_explore():
+	def voyage():
+		pass
+	def urlPhilter(self,urlSet,include):
 		pass
 
-	def update_visit():
-		pass
+
 
 # DRIVER CODE
 if __name__ == '__main__':
-	homeurl="https://www.livemint.com/companies/start-ups"
-	explorer=Explorer(homeurl)
-	explorer.explore()
+	# homeurl="https://www.livemint.com/companies/start-ups"
+	url='https://www.shoutmeloud.com/blog'
+	explorer=Explorer(url)
 
-
-	# pno=1
-	# pagesExhausted=0
-	# while pagesExhausted != 1 and pno <3:
-	# 	try:
-	# 		dynlink=baseurl+"/page-{}".format(pno)
-	# 		spider=Spider(baseurl)
-	# 		goodUrl=set(filter(lambda x:'.html' and category in x,spider.page.urls))
-	# 		print(len(goodUrl))
-
-	# 		pno+=1
-	# 	except Exception as e:
-	# 		pagesExhausted=1
-	# 		print(category,"Exhaust @ page{} with error {}".format(pno-1,e))
-
+	testx=explorer.findLinks(url)
 
 
 

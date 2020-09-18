@@ -30,3 +30,107 @@ console.error: SearchCache: "_readCacheFile: Error reading cache file:" (new Err
 1600212996567	Marionette	WARN	TLS certificate errors will be ignored for this session
 1600212999102	Marionette	INFO	Stopped listening on port 57468
 JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 697: Error: Phase "Sqlite.jsm: wait until all connections are closed" is finished, it is too late to register completion condition "protections.sqlite#0: waiting for shutdown"
+1600389252272	mozrunner::runner	INFO	Running command: "C:\\Program Files\\Mozilla Firefox\\firefox.exe" "-marionette" "-foreground" "-no-remote" "-profile" "C:\\Users\\dell\\AppData\\Local\\Temp\\rust_mozprofilemndg0O"
+JavaScript error: resource://gre/modules/XULStore.jsm, line 66: Error: Can't find profile directory.
+console.error: SearchCache: "_readCacheFile: Error reading cache file:" (new Error("", "(unknown module)"))
+1600389255542	Marionette	INFO	Listening on port 61067
+1600389255957	Marionette	WARN	TLS certificate errors will be ignored for this session
+1600389256666	Marionette	INFO	Stopped listening on port 61067
+JavaScript error: resource://gre/modules/UrlClassifierListManager.jsm, line 691: TypeError: this.tablesData[table] is undefined
+
+###!!! [Child][RunMessage] Error: Channel closing: too late to send/recv, messages will be lost
+
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+1600389499635	mozrunner::runner	INFO	Running command: "C:\\Program Files\\Mozilla Firefox\\firefox.exe" "-marionette" "-foreground" "-no-remote" "-profile" "C:\\Users\\dell\\AppData\\Local\\Temp\\rust_mozprofile4wR4GK"
+JavaScript error: resource://gre/modules/XULStore.jsm, line 66: Error: Can't find profile directory.
+console.error: SearchCache: "_readCacheFile: Error reading cache file:" (new Error("", "(unknown module)"))
+1600389502853	Marionette	INFO	Listening on port 61367
+1600389503046	Marionette	WARN	TLS certificate errors will be ignored for this session
+1600392040629	Marionette	INFO	Stopped listening on port 61367
+
+###!!! [Child][RunMessage] Error: Channel closing: too late to send/recv, messages will be lost
+
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+modules/XULStore.jsm, line 66: Error: Can't find profile directory.
+console.error: SearchCache: "_readCacheFile: Error reading cache file:" (new Error("", "(unknown module)"))
+1600389587170	Marionette	INFO	Listening on port 61645
+1600389587664	Marionette	WARN	TLS certificate errors will be ignored for this session
+JavaScript error: data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=, line 1: SyntaxError: illegal character
+JavaScript error: resource://gre/modules/AsyncShutdown.jsm, line 697: Error: Phase "Sqlite.jsm: wait until all connections are closed" is finished, it is too late to register completion condition "protections.sqlite#0: waiting for shutdown"
+1600389592597	Marionette	INFO	Stopped listening on port 61645
+
+###!!! [Child][RunMessage] Error: Channel closing: too late to send/recv, messages will be lost
+
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+1600391607239	mozrunner::runner	INFO	Running command: "C:\\Program Files\\Mozilla Firefox\\firefox.exe" "-marionette" "-foreground" "-no-remote" "-profile" "C:\\Users\\dell\\AppData\\Local\\Temp\\rust_mozprofile1I6TcD"
+JavaScript error: resource://gre/modules/XULStore.jsm, line 66: Error: Can't find profile directory.
+console.error: SearchCache: "_readCacheFile: Error reading cache file:" (new Error("", "(unknown module)"))
+1600391610533	Marionette	INFO	Listening on port 62728
+1600391610904	Marionette	WARN	TLS certificate errors will be ignored for this session
+SourceActor threw an exception: [Exception... "Component returned failure code: 0x80470002 (NS_BASE_STREAM_CLOSED) [nsIInputStream.available]"  nsresult: "0x80470002 (NS_BASE_STREAM_CLOSED)"  location: "JS frame :: resource://devtools/shared/DevToolsUtils.js :: onResponse :: line 560"  data: no]
+Stack: onResponse@resource://devtools/shared/DevToolsUtils.js:560:34
+onStopRequest@resource://gre/modules/NetUtil.jsm:128:18
+Line: 560, column: 0
+console.error: ({})
+JavaScript error: resource://devtools/shared/DevToolsUtils.js, line 560: NS_BASE_STREAM_CLOSED: Component returned failure code: 0x80470002 (NS_BASE_STREAM_CLOSED) [nsIInputStream.available]
+JavaScript error: https://www.googletagmanager.com/gtm.js?id=GTM-TFD6PTW, line 902: SecurityError: The operation is insecure.
+JavaScript error: https://www.googletagmanager.com/gtm.js?id=GTM-TFD6PTW, line 902: SecurityError: The operation is insecure.
+JavaScript error: https://www.googletagmanager.com/gtm.js?id=GTM-TFD6PTW, line 902: SecurityError: The operation is insecure.
+JavaScript error: https://www.googletagmanager.com/gtm.js?id=GTM-TFD6PTW, line 902: SecurityError: The operation is insecure.
+JavaScript error: https://www.googletagmanager.com/gtm.js?id=GTM-TFD6PTW, line 902: SecurityError: The operation is insecure.
+JavaScript error: https://www.googletagmanager.com/gtm.js?id=GTM-TFD6PTW, line 902: SecurityError: The operation is insecure.
+JavaScript error: https://www.googletagmanager.com/gtm.js?id=GTM-TFD6PTW, line 902: SecurityError: The operation is insecure.
+JavaScript error: https://www.googletagmanager.com/gtm.js?id=GTM-TFD6PTW, line 902: SecurityError: The operation is insecure.
+JavaScript error: https://www.googletagmanager.com/gtm.js?id=GTM-TFD6PTW, line 902: SecurityError: The operation is insecure.
+JavaScript error: https://www.googletagmanager.com/gtm.js?id=GTM-TFD6PTW, line 902: SecurityError: The operation is insecure.
+JavaScript error: https://www.googletagmanager.com/gtm.js?id=GTM-TFD6PTW, line 902: SecurityError: The operation is insecure.
+JavaScript error: https://www.googletagmanager.com/gtm.js?id=GTM-TFD6PTW, line 902: SecurityError: The operation is insecure.
+JavaScript error: https://www.googletagmanager.com/gtm.js?id=GTM-TFD6PTW, line 902: SecurityError: The operation is insecure.
+JavaScript error: https://www.googletagmanager.com/gtm.js?id=GTM-TFD6PTW, line 902: SecurityError: The operation is insecure.
+1600391696997	Marionette	INFO	Stopped listening on port 62728
+
+###!!! [Child][RunMessage] Error: Channel closing: too late to send/recv, messages will be lost
+
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+1600391731695	mozrunner::runner	INFO	Running command: "C:\\Program Files\\Mozilla Firefox\\firefox.exe" "-marionette" "-foreground" "-no-remote" "-profile" "C:\\Users\\dell\\AppData\\Local\\Temp\\rust_mozprofile0MvGKm"
+JavaScript error: resource://gre/modules/XULStore.jsm, line 66: Error: Can't find profile directory.
+console.error: SearchCache: "_readCacheFile: Error reading cache file:" (new Error("", "(unknown module)"))
+1600391734936	Marionette	INFO	Listening on port 62936
+1600391735554	Marionette	WARN	TLS certificate errors will be ignored for this session
+1600392046294	Marionette	INFO	Stopped listening on port 62936
+
+###!!! [Child][RunMessage] Error: Channel closing: too late to send/recv, messages will be lost
+
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+modules/XULStore.jsm, line 66: Error: Can't find profile directory.
+console.error: SearchCache: "_readCacheFile: Error reading cache file:" (new Error("", "(unknown module)"))
+1600391928071	Marionette	INFO	Listening on port 63110
+1600391928231	Marionette	WARN	TLS certificate errors will be ignored for this session
+1600392038231	Marionette	INFO	Stopped listening on port 63110
+
+###!!! [Child][RunMessage] Error: Channel closing: too late to send/recv, messages will be lost
+
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+modules/XULStore.jsm, line 66: Error: Can't find profile directory.
+console.error: SearchCache: "_readCacheFile: Error reading cache file:" (new Error("", "(unknown module)"))
+1600392035031	Marionette	INFO	Listening on port 63243
+1600392035548	Marionette	WARN	TLS certificate errors will be ignored for this session
+1600392054179	Marionette	INFO	Stopped listening on port 63243
+
+###!!! [Child][RunMessage] Error: Channel closing: too late to send/recv, messages will be lost
+
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
