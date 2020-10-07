@@ -5,13 +5,13 @@ import random
 
 class Memory:
 	jsonDumpNodeCache=10
-	urlVisitsSaveStateThreshold=10
-	urlVisits=0
+	visitFileHomogenizeThreshold=10
+	visitCount=1
 
 class Macros:
 	def homogenize(self,filename):
-		threshold=Memory.urlVisitsSaveStateThreshold
-		if Memory.urlVisits%threshold==0:
+		threshold=Memory.visitFileHomogenizeThreshold
+		if Memory.visitCount%threshold==0:
 			iset=set(mx.fread(filename).split('\n'))
 			uset="\n".join(list(iset))
 			mx.fwrite(filename,uset)
@@ -37,6 +37,7 @@ class Explorer:
 		self.domainVisitFile=self.currentDomainPath+'visited.url'
 		self.profile_check_make(self.domain) #MAKE A PROFILE FOR DOMAIN
 
+
 	def profile_check_make(self,domain):
 		#smart profile management for scraper
 		try:
@@ -56,39 +57,40 @@ class Explorer:
 
 	# ============================MAIN LOGIC FUNCTONS==============================
 
-	def exploreLinks(self,url):
+	def exploreLinks(self,soup):
 		def update_exploredURLMemory(self,nowDiscovered):#unique set of link, adds discovered links to file
 			self.exploredURLMemory= set(mx.fread(self.domainExploreFile).split('\n'))#reducing compute
 			difference= list(set(nowDiscovered).difference(self.exploredURLMemory))
 			self.exploredURLMemory.update(difference)
 			updateFile= mx.fappend(self.domainExploreFile, "\n".join(difference+['\n']))
-
+			#||
 			if Logging.showDiscoverCount: print("added {} URL records\n".format(len(difference)))
 
 
-		page=mx.get_page(url, soupify=True)
-		allLinks=page.findAll('a',href=True)
+		allLinks=soup.findAll('a',href=True)
 		filteredLinks=[l['href'] for l in allLinks if ('-' or 'html' in l['href']) or (l['href'][0]=='/')  ]
 		# filteredLinks=[ul for ul in filteredLinks ] #Relative url Handling
 		filteredLinks=[x for x in filteredLinks if ('http' in x) and (self.baseurl == x[:len(self.baseurl)]) and ('comment' not in x)]
 		update_exploredURLMemory(self,filteredLinks)
-		if len(self.pendingURLList)<=1: self.calculate_pendingURLList(url)
+		self.calculate_pendingURLList(url)
 
 
-	def calculate_pendingURLList(self,nowVisited):
+	def calculate_pendingURLList(self,nowVisited):#calculate after visiting
 		def update_visitedURLMemory(nowVisited):
 			#update in file First Important
 			Macros.homogenize(self,self.domainVisitFile)
 			mx.fappend(self.domainVisitFile,"\n"+nowVisited)
 			self.visitedURLMemory=mx.fread(self.domainVisitFile).split('\n')
-
+		#||
 		update_visitedURLMemory(nowVisited)
-		self.pendingURLList=list(self.exploredURLMemory.difference(self.visitedURLMemory))
+		self.pendingURLList=list(self.exploredURLMemory.difference(self.visitedURLMemory))# ==A-B
 
 
 	#visit page and gather info
-	def visit(self,url):
+	def visit(self,url,save=1):
 		def extract_info(soup):
+			p=[x.e for x in soup.findAll(['script','style'])]
+			print(p)
 			currentPageData={}
 			headtags= ['h1','h2','h3','h4']
 			currentPageData['url']= url
@@ -101,10 +103,10 @@ class Explorer:
 
 		try:
 			page= mx.get_page(url)
-			self.exploreLinks(url)
+			self.exploreLinks(page)
 			self.calculate_pendingURLList(url)
-			save_info(extract_info(page))
-			Memory.urlVisits+=1		
+			if save : save_info(extract_info(page))
+			Memory.visitCount+=1		
 		except Exception as e:
 			print('exception during visit:',e)
 
@@ -119,6 +121,7 @@ class Explorer:
 			if Logging.showPendingCount: print(len(explorer.pendingURLList),'pending URLs')
 
 
+
 # DRIVER CODE
 def startThreads(count,functionInstance,argsTuple=''):
 	threadBread=[]
@@ -130,8 +133,6 @@ def startThreads(count,functionInstance,argsTuple=''):
 
 if __name__ == '__main__':
 	url='https://www.bloomreach.com/en/blog/'
-	explorer=Explorer(url)
-	explorer.exploreLinks(url)#initialize seed url
-	startThreads(20,explorer.web_voyage)
-
-
+	# explorer=Explorer(url)
+	# explorer.visit(url)#initialize seed url
+	# # startThreads(20,explorer.web_voyage)
