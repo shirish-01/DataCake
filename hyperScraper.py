@@ -1,54 +1,57 @@
+# V1.1
 from mxproxy import mx
-import threading
+import threading, time
 import os
 import random
+import re
+	
+
 
 class Memory:
-	jsonDumpNodeCache=10
-	visitFileHomogenizeThreshold=10
+	visitFileHomogenizeThreshold=100
 	visitCount=1
 
-class Macros:
-	def homogenize(self,filename):
-		threshold=Memory.visitFileHomogenizeThreshold
-		if Memory.visitCount%threshold==0:
-			iset=set(mx.fread(filename).split('\n'))
-			uset="\n".join(list(iset))
-			mx.fwrite(filename,uset)
-			print('homogenized')
-
 class Logging:
-	showDiscoverCount=1
-	showPendingCount=True
+	showDiscoverCount=0
+	showPendingCount=1
 	showCurrentVisit=0
 		
 class Explorer:
+	'''USAGE:
+			url='https://www.quicksprout.com'
+			explorer=Explorer(url) 	#makes profiles and bg stuff
+			startThreads(20,explorer.web_voyage)
+	'''
 	def __init__(self,url):
+	#SEED VARIABLES
 		self.url=url
 		self.baseurl='/'.join(url.split('/')[0:3])
 		self.domain= url.split("/")[2]
-		self.pendingURLList=[]
-		#dynamic profile creation variables
-		self.programName=__file__.split("\\")[-1].split('.')[0]
+		self.regex=self.baseurl+r'/article.*'
+		print(self.regex)
+	#INIT AND SETUP VARIABLES
+		self.programName='hyperScraper'
 		self.profileFolder=self.programName+"_profiles"
 		self.currentDomainPath='./{}/{}/'.format(self.profileFolder,self.domain)
 		self.domainDataFolder=self.currentDomainPath+"data/"
 		self.domainExploreFile=self.currentDomainPath+'explored.url'
 		self.domainVisitFile=self.currentDomainPath+'visited.url'
 		self.profile_check_make(self.domain) #MAKE A PROFILE FOR DOMAIN
+	#INIT RUNTIME VARIABLES
+		self.exploredURLMemory= mx.setload(	self.domainExploreFile	)
+		self.visitedURLMemory=	mx.setload(	self.domainVisitFile	)
+		self.pendingURLMemory= list(self.exploredURLMemory -self.visitedURLMemory)
+	#INITIAL SEED
+		self.visit(url)	#initialize seed url and build links
 
-
-	def profile_check_make(self,domain):
-		#smart profile management for scraper
-		try:
-			#make profile folder and create an domain
+	def profile_check_make(self,domain): #smart profile management for scraper
+		try: #make profile folder and create an domain
 			if not os.path.exists(self.profileFolder): 
-				os.mkdir(self.profileFolder) ;print("Created Folder",self.profileFolder)
-			os.mkdir(self.currentDomainPath)
-
+				os.mkdir(self.profileFolder)
+			if not os.path.exists(self.currentDomainPath):
+				os.mkdir(self.currentDomainPath)
 			if not os.path.exists(self.domainDataFolder):
 				os.mkdir(self.domainDataFolder)
-
 		except:
 			print(self.domain,"profile already exist")
 		finally:
@@ -57,82 +60,96 @@ class Explorer:
 
 	# ============================MAIN LOGIC FUNCTONS==============================
 
-	def exploreLinks(self,soup):
-		def update_exploredURLMemory(self,nowDiscovered):#unique set of link, adds discovered links to file
-			self.exploredURLMemory= set(mx.fread(self.domainExploreFile).split('\n'))#reducing compute
-			difference= list(set(nowDiscovered).difference(self.exploredURLMemory))
-			self.exploredURLMemory.update(difference)
-			updateFile= mx.fappend(self.domainExploreFile, "\n".join(difference+['\n']))
-			#||
-			if Logging.showDiscoverCount: print("added {} URL records\n".format(len(difference)))
+	def update_exploredURLMemory(self,newLinks):
+		difference= newLinks - self.exploredURLMemory #save DATA IO by calc difference
+		if difference:
+			mx.fappend(self.domainExploreFile, "\n".join(difference)+'\n')
+			self.exploredURLMemory.update(newLinks) #add just discovered links
+		if Logging.showDiscoverCount: print(f"Discovered {len(difference)} URLS")
+
+	def update_visitedURLMemory(self,current_visited_url):
+		if current_visited_url not in self.visitedURLMemory:
+			mx.fappend(self.domainVisitFile,"\n"+current_visited_url)
+		self.visitedURLMemory.add(current_visited_url)
+
+	def update_pendingURLMemory(self):#calculate after visiting
+		self.pendingURLMemory= list(self.exploredURLMemory- self.visitedURLMemory)# ==A-B
+		if Logging.showPendingCount: print(len(self.exploredURLMemory)- len(self.visitedURLMemory),' |Pending URLSs')
+
+	def get_all_links(self,soup):
+		#unique set of link, adds discovered links to file
+		freshlinks=[l['href'] for l in soup.findAll('a',href=True)]
+		newlinksfiltered=set()
+		for x in freshlinks: #FILTER UNWANTED LINKS
+			if x[0]=='/':
+				x=self.baseurl+x # print(x)
+			match=re.search(self.regex,x)
+			if match: 
+				matchtext=match.group()
+				newlinksfiltered.add(matchtext)
+		# print(newlinksfiltered)
+		return newlinksfiltered
 
 
-		allLinks=soup.findAll('a',href=True)
-		filteredLinks=[l['href'] for l in allLinks if ('-' or 'html' in l['href']) or (l['href'][0]=='/')  ]
-		# filteredLinks=[ul for ul in filteredLinks ] #Relative url Handling
-		filteredLinks=[x for x in filteredLinks if ('http' in x) and (self.baseurl == x[:len(self.baseurl)]) and ('comment' not in x)]
-		update_exploredURLMemory(self,filteredLinks)
-		self.calculate_pendingURLList(url)
+	def visit(self,url): #visit page and gather info
+		from scraper_utils import *
+		def extract_info(soup,url=url):
+			bodyIdentifier='article'
+			headIdentifier='h1'
+			pageDict={}
+			pageDict['url']=url
+			pageDict['head']=sanitize_text(soup.select_one(headIdentifier).get_text())
+			pageDict['body']=soup_select(soup,bodyIdentifier)
+			pageDict['time']=str(random.randint(1,90)/2)+' Days Ago'
+			pageDict['imgs']=str(soup.select(bodyIdentifier+' img'))
+			print(pageDict['head'])
+			# return mx.jdumps(pageDict)
+			return pageDict
 
-
-	def calculate_pendingURLList(self,nowVisited):#calculate after visiting
-		def update_visitedURLMemory(nowVisited):
-			#update in file First Important
-			Macros.homogenize(self,self.domainVisitFile)
-			mx.fappend(self.domainVisitFile,"\n"+nowVisited)
-			self.visitedURLMemory=mx.fread(self.domainVisitFile).split('\n')
-		#||
-		update_visitedURLMemory(nowVisited)
-		self.pendingURLList=list(self.exploredURLMemory.difference(self.visitedURLMemory))# ==A-B
-
-
-	#visit page and gather info
-	def visit(self,url,save=1):
-		def extract_info(soup):
-			p=[x.e for x in soup.findAll(['script','style'])]
-			print(p)
-			currentPageData={}
-			headtags= ['h1','h2','h3','h4']
-			currentPageData['url']= url
-			currentPageData['headings']= {h:[x.text for x in soup.findAll(h) if x.text!='' ] for h in headtags}
-			currentPageData['images']= [x['src'] for x in soup.findAll('img') if len(x['src'])<500 ]
-			currentPageData['content']=[(lambda x:x.text)(x.extract())  for x in soup.findAll('p') ]
-			return mx.jdumps(currentPageData) 
-		def save_info(data):
-			mx.fappend(self.domainDataFolder+'data-chunk-1.json',data)
+		def save_to_disk(label,data):
+			mx.fwrite(self.domainDataFolder+f'{label}.json',data)
 
 		try:
-			page= mx.get_page(url)
-			self.exploreLinks(page)
-			self.calculate_pendingURLList(url)
-			if save : save_info(extract_info(page))
-			Memory.visitCount+=1		
-		except Exception as e:
-			print('exception during visit:',e)
+			page= mx.get_page_soup(url)
+			pageinfojson=extract_info(page)
+			self.update_exploredURLMemory(self.get_all_links(page))
+			self.update_visitedURLMemory(url)
+			self.update_pendingURLMemory()
+			save_to_disk(	file_namer(pageinfojson['head']) ,mx.jdumps(pageinfojson) )
+			Memory.visitCount+=1
+			if Logging.showCurrentVisit: print(f'{ threading.current_thread().ident:<6}>> {url}')
+		except Exception as e: raise e;print('exception 		',url,e)
 
-	#Recursive Crawling
-	def web_voyage(self):
-		# self.visit(self.url)
-		for e in self.pendingURLList:
-			choice= random.choice(self.pendingURLList)
-			self.pendingURLList.remove(choice)
-			self.visit(choice)
-			if Logging.showCurrentVisit: print('current :',choice)
-			if Logging.showPendingCount: print(len(explorer.pendingURLList),'pending URLs')
-
+	def web_voyage(self): #Recursive Crawling
+		while True:
+			try:	
+				url_current=mx.pickrandom(self.pendingURLMemory)
+				self.visit(url_current)
+				time.sleep(0.2)
+			except:
+				print('>>> Voyage ENDED')
 
 
 # DRIVER CODE
-def startThreads(count,functionInstance,argsTuple=''):
+def startThreads(instance,count):
 	threadBread=[]
-	for thread in range(count):
-		thread= threading.Thread(target=functionInstance, args=() )#can use eval for args tuple
+	for c in range(count):
+		thread= threading.Thread(target=instance.web_voyage)
 		threadBread.append(thread)
-	for thread in threadBread:
-		thread.start()
+		threadBread[c].start()
+		time.sleep(0.5)
 
+	'''||'''
+	'''||'''
+	'''||'''
+	'''||'''
+	'''||'''
+	'''||'''
+	'''||'''
+
+#MAINCODE STARTS HERE
 if __name__ == '__main__':
-	url='https://www.bloomreach.com/en/blog/'
-	# explorer=Explorer(url)
-	# explorer.visit(url)#initialize seed url
-	# # startThreads(20,explorer.web_voyage)
+	urlinit='https://www.entrepreneur.com/article/359493'
+	explorer=Explorer(urlinit)
+	startThreads(explorer,20)
+
