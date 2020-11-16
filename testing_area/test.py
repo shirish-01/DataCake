@@ -26,15 +26,45 @@ import time
 
 data2=open('dummy.html','r',encoding='utf-8').read()
 
-mysoup=soup(data2,'lxml')
+# data2='<p><img alt="image20" class="aligncenter size-full wp-image-16018 lazyloaded" data-ll-status="loaded" height="770" sizes="(max-width: 1024px) 100vw, 1024px" src="https://neilpatel.com/wp-content/uploads/2016/05/image20-6.png" srcset="https://neilpatel.com/wp-content/uploads/2016/05/image20-6.png 1024w, https://neilpatel.com/wp-content/uploads/2016/05/image20-6-350x263.png 350w, https://neilpatel.com/wp-content/uploads/2016/05/image20-6-768x578.png 768w, https://neilpatel.com/wp-content/uploads/2016/05/image20-6-700x526.png 700w" width="1024"/></p>'
+mysoup=soup(data2,'html5lib')
 
 ta=time.time()
-par=mysoup.p.parent
-actualbody=par.children
-for x in actualbody:
-	gaysoup=mysoup.findAll('p')
-	if x.name:
-		print(x.text+'\n')
-tb=time.time()
 
-print(tb-ta)
+targetbody=mysoup.p.parent.extract()
+
+elist=targetbody.find_all('span')
+
+def tag_unwrapper(tagname,input):
+	pass
+
+for x in targetbody.findAll():
+	try:
+		for s in x.findAll('span'):
+			s=s.unwrap()
+			...
+	except Exception as e:
+		# print(e)
+		# raise e
+		...
+
+try:
+	c=0
+	arr=targetbody.find_all('img')
+	for item in arr :
+		# newtag=mysoup.new_tag('img',src=arr[c]['src'])
+		freez_attrs=list(arr[c].attrs.keys())
+		for attr in freez_attrs:
+			if attr != 'src':
+				del item[attr]
+		print(item)
+
+		# arr[c].replace_with(newtag)
+		c+=1
+except Exception as e:
+	print(e)
+	raise e
+	...
+
+print(targetbody)
+# print(dir(targetbody))
